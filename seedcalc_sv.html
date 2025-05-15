@@ -76,6 +76,8 @@
         <label>Tusenkornvikt (g):</label>
         <input type="number" id="tkv" placeholder="Ange tusenkornvikt">
         <button onclick="calculateSeedRate()">Beräkna utsädesmängd</button>
+        <button onclick="captureImage()">Skanna uppgifterna med kameran</button>
+        <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="processImage(event)">
         <div id="output">SeedCalc: </div>
     </div>
 </body>
@@ -96,6 +98,33 @@
         }
         const seedRate = (kernels * tkv) / germination;
         document.getElementById('output').textContent = `Utsädesmängd: ${seedRate.toFixed(2)} kg/ha`;
+    }
+
+    function captureImage() {
+        document.getElementById('imageInput').click();
+    }
+
+    function processImage(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                Tesseract.recognize(
+                    e.target.result,
+                    'eng',
+                    { logger: m => console.log(m) }
+                ).then(({ data: { text } }) => {
+                    alert('Skannad text: ' + text);
+                    const germinationMatch = text.match(/Grobarhet: (\d+)%/);
+                    const tkvMatch = text.match(/Tusenkornvikt: (\d+)/);
+                    const cropMatch = text.match(/Gröda: (\w+)/);
+                    if (germinationMatch) document.getElementById('germination').value = germinationMatch[1];
+                    if (tkvMatch) document.getElementById('tkv').value = tkvMatch[1];
+                    if (cropMatch) alert('Identifierad gröda: ' + cropMatch[1]);
+                });
+            };
+            reader.readAsDataURL(file);
+        }
     }
 </script>
 </html>
