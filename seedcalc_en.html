@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="sv">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>SeedCalc</title>
@@ -14,11 +14,18 @@
             background-size: cover;
             background-position: center;
         }
+        .calculator {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            margin: 20px 0;
+        }
         h2 {
             text-align: center;
             font-size: 1.5em;
             margin-bottom: 15px;
-            color: #fff;
+            color: #333;
         }
         select, input, button {
             width: 100%;
@@ -49,26 +56,28 @@
     </style>
 </head>
 <body>
-    <h2>SeedCalc</h2>
-    <label>Choose crop:</label>
-    <select id="crop" onchange="updateKernels()">
-        <option value="250">Vete</option>
-        <option value="400">Havre</option>
-        <option value="300">Råg</option>
-        <option value="350">Korn</option>
-        <option value="500">Ärtor</option>
-        <option value="450">Lin</option>
-        <option value="550">Bovete</option>
-        <option value="600">Sojabönor</option>
-    </select>
-    <label>Number of viable seeds per m²:</label>
-    <input type="number" id="kernels" value="250">
-    <label>Germination (%):</label>
-    <input type="number" id="germination" placeholder="Ange grobarhet">
-    <label>Thousand grain weight (g):</label>
-    <input type="number" id="tkv" placeholder="Ange tusenkornvikt">
-    <button onclick="calculateSeedRate()">Calculate seed rate</button>
-    <div id="output">SeedCalc: </div>
+    <div class="calculator">
+        <h2>SeedCalc</h2>
+        <label>Choose crop:</label>
+        <select id="crop" onchange="updateKernels()">
+            <option value="250">Wheat</option>
+            <option value="400">Oats</option>
+            <option value="300">Rye</option>
+            <option value="350">Barley</option>
+            <option value="500">Peas</option>
+            <option value="450">Flax</option>
+            <option value="550">Buckwheat</option>
+            <option value="600">Soybeans</option>
+        </select>
+        <label>Number of viable seeds per m²:</label>
+        <input type="number" id="kernels" value="250">
+        <label>Germination (%):</label>
+        <input type="number" id="germination" placeholder="Enter germination rate">
+        <label>Thousand grain weight (g):</label>
+        <input type="number" id="tkv" placeholder="Enter thousand grain weight">
+        <button onclick="calculateSeedRate()">Calculate seed rate</button>
+        <div id="output">SeedCalc: </div>
+    </div>
 </body>
 <script>
     function updateKernels() {
