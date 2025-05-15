@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>SeedCalc</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.3/dist/tesseract.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 400px;
+            margin: auto;
+            background-image: url('background.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+        h2 {
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        select, input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #output {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            text-align: center;
+            font-size: 1.1em;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h2>SeedCalc</h2>
+    <label>Välj gröda:</label>
+    <select id="crop" onchange="updateKernels()">
+        <option value="250">Vete</option>
+        <option value="400">Havre</option>
+        <option value="300">Råg</option>
+        <option value="350">Korn</option>
+        <option value="500">Ärtor</option>
+        <option value="450">Lin</option>
+        <option value="550">Bovete</option>
+        <option value="600">Sojabönor</option>
+    </select>
+    <label>Antal kärnor per m² (justerbart):</label>
+    <input type="number" id="kernels" value="250">
+    <label>Grobarhet (%):</label>
+    <input type="number" id="germination" placeholder="Ange grobarhet">
+    <button onclick="calculateSeedRate()">Beräkna utsädesmängd</button>
+    <button onclick="captureImage()">Skanna från påse</button>
+    <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="processImage(event)">
+    <div id="output">SeedCalc: </div>
+
+    <script>
+        function updateKernels() {
+            const crop = document.getElementById('crop');
+            const kernels = crop.options[crop.selectedIndex].value;
+            document.getElementById('kernels').value = kernels;
+        }
+
+        function calculateSeedRate() {
+            const kernels = parseFloat(document.getElementById('kernels').value);
+            const germination = parseFloat(document.getElementById('germination').value);
+            if (isNaN(kernels) || isNaN(germination) || germination <= 0 || germination > 100) {
+                alert('Ange giltiga värden.');
+                return;
+            }
+            const seedRate = (kernels * 10000) / (germination / 100 * 1000);
+            document.getElementById('output').textContent = `Utsädesmängd: ${seedRate.toFixed(2)} kg/ha`;
+        }
+
+        function captureImage() {
+            document.getElementById('imageInput').click();
+        }
+
+        function processImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    Tesseract.recognize(
+                        e.target.result,
+                        'eng',
+                        { logger: m => console.log(m) }
+                    ).then(({ data: { text } }) => {
+                        alert('Skannad text: ' + text);
+                        const match = text.match(/Grobarhet: (\d+)%\s+Kärnor\/m²: (\d+)/);
+                        if (match) {
+                            document.getElementById('germination').value = match[1];
+                            document.getElementById('kernels').value = match[2];
+                        } else {
+                            alert('Kunde inte hitta grobarhet och kärnmängd i texten.');
+                        }
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+</body>
+</html>
