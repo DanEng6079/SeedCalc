@@ -1,8 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
 <head>
     <meta charset="UTF-8">
-    <title>SeedCalc - Language Selection</title>
+    <title>Kalkylera utsädesmängd med SeedCalc</title>
+    <meta name="description" content="SeedCalc – en gratis utsädeskalkylator för att räkna utsädesmängd per hektar baserat på gröda, grobarhet och tusenkornvikt.">
+    <meta name="keywords" content="utsädeskalkylator, utsädesmängd, lantbruk, sådd, hektar, grobarhet, tusenkornvikt, kalkylera utsädesmängd, seed calculator">
+    <meta name="google-site-verification" content="xvUPdYaupmoEI2P11S2_ZhrTFysJ3nu_i_DvBJliLC0" />
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -38,10 +41,17 @@
             background-color: #45a049;
         }
     </style>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NVZ9EHK36E"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-NVZ9EHK36E');
+    </script>
 </head>
 <body>
-    <h2>Welcome to SeedCalc, a tool for calculating the correct amount of seed per hectare. Choose language below:</h2>
-    <button onclick="window.location.href='seedcalc_sv.html'">Svenska</button>
-    <button onclick="window.location.href='seedcalc_en.html'">English</button>
+    <h2>Välkommen till SeedCalc – Utsädeskalkylator för lantbruk</h2>
+    <button onclick="gtag('event', 'språkval', {event_label: 'svenska'}); window.location.href='seedcalc_sv.html'">Svenska</button>
+    <button onclick="gtag('event', 'språkval', {event_label: 'engelska'}); window.location.href='seedcalc_en.html'">English</button>
 </body>
 </html>
