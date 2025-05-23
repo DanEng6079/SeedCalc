@@ -1,136 +1,126 @@
-<!DOCTYPE html>
-<html lang="sv">
-<head>
-    <meta charset="UTF-8">
-    <title>SeedCalc</title>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.3/dist/tesseract.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-image: url('background.jpg');
-            background-size: cover;
-            background-position: center;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-        .calculator {
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-            max-width: 95%;
-            width: 100%;
-            margin: auto;
-        }
-        h2 {
-            text-align: center;
-            font-size: 2em;
-            margin-bottom: 15px;
-            color: #333;
-        }
-        select, input, button {
-            width: 100%;
-            padding: 15px;
-            margin: 8px 0;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            font-size: 1.2em;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        #output {
-            margin-top: 15px;
-            padding: 15px;
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 8px;
-            text-align: center;
-            font-size: 1.2em;
-            color: #333;
-        }
-    </style>
-</head>
-<body>
-    <div class="calculator">
-        <h2>SeedCalc</h2>
-        <label>Choose crop:</label>
-        <select id="crop" onchange="updateKernels()">
-            <option value="250">Vete</option>
-            <option value="400">Havre</option>
-            <option value="300">Råg</option>
-            <option value="350">Korn</option>
-            <option value="500">Ärtor</option>
-            <option value="450">Lin</option>
-            <option value="550">Bovete</option>
-            <option value="600">Sojabönor</option>
-        </select>
-        <label>Number of viable seeds per m²:</label>
-        <input type="number" id="kernels" value="250">
-        <label>Germination (%):</label>
-        <input type="number" id="germination" placeholder="Ange grobarhet">
-        <label>Thousand grain weight (g):</label>
-        <input type="number" id="tkv" placeholder="Ange tusenkornvikt">
-        <button onclick="calculateSeedRate()">Calculate seed rate</button>
-        <button onclick="captureImage()">Scan data with camera</button>
-        <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="processImage(event)">
-        <div id="output">SeedCalc: </div>
-    </div>
-</body>
+<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>SeedCalc</title><style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-image: url('background.jpg');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.calculator {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 500px;
+}
+h2 {
+    text-align: center;
+    font-size: 3em;
+    margin-bottom: 30px;
+    color: #333;
+}
+select, input, button {
+    width: 66%;
+    padding: 20px;
+    margin: 12px auto;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 2em;
+    display: block;
+}
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+}
+button:hover {
+    background-color: #45a049;
+}
+#output {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.85);
+    border-radius: 10px;
+    text-align: center;
+    font-size: 2.2em;
+    color: #333;
+}
+</style>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-NVZ9EHK36E"></script>
 <script>
-    function updateKernels() {
-        const crop = document.getElementById('crop');
-        const kernels = crop.options[crop.selectedIndex].value;
-        document.getElementById('kernels').value = kernels;
-    }
-
-    function calculateSeedRate() {
-        const kernels = parseFloat(document.getElementById('kernels').value);
-        const germination = parseFloat(document.getElementById('germination').value);
-        const tkv = parseFloat(document.getElementById('tkv').value);
-        if (isNaN(kernels) || isNaN(germination) || isNaN(tkv) || germination <= 0 || germination > 100) {
-            alert('Enter valid values.');
-            return;
-        }
-        const seedRate = (kernels * tkv) / germination;
-        document.getElementById('output').textContent = `Utsädesmängd: ${seedRate.toFixed(2)} kg/ha`;
-    }
-
-    function captureImage() {
-        document.getElementById('imageInput').click();
-    }
-
-    function processImage(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                Tesseract.recognize(
-                    e.target.result,
-                    'eng',
-                    { logger: m => console.log(m) }
-                ).then(({ data: { text } }) => {
-                    alert('Scanned text: ' + text);
-                    const germinationMatch = text.match(/Grobarhet: (\d+)%/);
-                    const tkvMatch = text.match(/Tusenkornvikt: (\d+)/);
-                    const cropMatch = text.match(/Gröda: (\w+)/);
-                    if (germinationMatch) document.getElementById('germination').value = germinationMatch[1];
-                    if (tkvMatch) document.getElementById('tkv').value = tkvMatch[1];
-                    if (cropMatch) alert('Identified crop: ' + cropMatch[1]);
-                });
-            };
-            reader.readAsDataURL(file);
-        }
-    }
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-NVZ9EHK36E');
 </script>
-</html>
+</head><body>
+<div class="calculator">
+    <h2>SeedCalc</h2>
+    <label style="font-size: 2em;">Choose crop:</label>
+    <select id="crop" onchange="updateKernels()">
+        <option value="250">Vete</option>
+        <option value="400">Havre</option>
+        <option value="300">Råg</option>
+        <option value="350">Korn</option>
+        <option value="500">Ärtor</option>
+        <option value="450">Lin</option>
+        <option value="550">Bovete</option>
+        <option value="600">Sojabönor</option>
+    </select>
+    <label style="font-size: 2em;">Number of viable seeds per m²:</label>
+    <input type="number" id="kernels" value="250">
+    <label style="font-size: 2em;">Germination (%):</label>
+    <input type="number" id="germination" placeholder="Enter germination rate">
+    <label style="font-size: 2em;">Thousand grain weight (g):</label>
+    <input type="number" id="tkv" placeholder="Enter thousand grain weight">
+    <button onclick="gtag('event', 'klick', {event_label: 'beräkna'}); calculateSeedRate()">Calculate seed rate</button>
+    <button onclick="gtag('event', 'klick', {event_label: 'skanna'}); captureImage()">Scan data with camera</button>
+    <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="processImage(event)">
+    <div id="output">SeedCalc: </div>
+    <p style="text-align:center; margin-top:30px;"><a href="https://forms.gle/i9gpzZsqBhLRJVSa6" target="_blank" style="font-size: 2em;">Give us your feedback!</a></p>
+</div>
+
+<script>
+function updateKernels() {
+    const crop = document.getElementById('crop');
+    document.getElementById('kernels').value = crop.options[crop.selectedIndex].value;
+}
+function calculateSeedRate() {
+    const kernels = parseFloat(document.getElementById('kernels').value);
+    const germination = parseFloat(document.getElementById('germination').value);
+    const tkv = parseFloat(document.getElementById('tkv').value);
+    if (isNaN(kernels) || isNaN(germination) || isNaN(tkv) || germination <= 0 || germination > 100) {
+        alert('Enter valid values.');
+        return;
+    }
+    const seedRate = (kernels * tkv) / germination;
+    document.getElementById('output').textContent = 'Seed rate: ' + seedRate.toFixed(2) + ' kg/ha';
+}
+function captureImage() {
+    document.getElementById('imageInput').click();
+}
+function processImage(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            Tesseract.recognize(e.target.result, 'eng').then(({ data: { text } }) => {
+                const germinationMatch = text.match(/Germination: (\d+)%/);
+                const tkvMatch = text.match(/Thousand grain weight: (\d+)/);
+                if (germinationMatch) document.getElementById('germination').value = germinationMatch[1];
+                if (tkvMatch) document.getElementById('tkv').value = tkvMatch[1];
+            });
+        };
+        reader.readAsDataURL(file);
+    }
+}
+</script>
+</body></html>
